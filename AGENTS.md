@@ -9,6 +9,7 @@
 - **Framework**: React 19 + TypeScript via Vite
 - **Location**: `~/Documents/Programming/battle-todo`
 - **Build command**: `bun run build`
+- **Typecheck**: `bun run typecheck` (`tsc --noEmit` — must pass; catches prop-type and state-shape errors that Vite build alone does not)
 - **Dev command**: `bun run dev`
 - **Lint**: `bun x biome check`
 - **Format**: `bun x biome format --write`
@@ -27,7 +28,8 @@ src/
 ├── types.ts                   # All TypeScript interfaces (Player, Task, GameState, etc.)
 ├── utils/
 │   ├── helpers.ts             # generateId, saveState, loadState, createPlayer
-│   └── constants.ts           # STORAGE_KEY, initialState, HP color constants, timeouts
+│   ├── sound.ts               # WebAudio synth SFX (hit, crit, heal, turn, victory), mute persisted in localStorage
+│   └── constants.ts           # STORAGE_KEY, initialState, player/HP color constants, timeouts
 ├── hooks/
 │   └── useGame.ts             # Custom hook: all game logic and state management
 └── components/
@@ -142,10 +144,10 @@ Previously `isWinner !== null` and `isWinner !== true` were used instead of `isW
 ## CSS Conventions
 
 - CSS custom properties used for theme colors: `--player-color`, `--player-glow`, `--hp-green`, etc.
-- `.player-panel` styles use `::before` pseudo-element for the colored top border
-- `.flipped` class on Player 2 panel adds a left border (not a flip)
-- `.effects-layer` has `overflow: hidden` to clip flying number animations
-- All keyframe animations are in `src/index.css`
+- Fighter cards set `--player-color`/`--player-glow` inline; children consume them (quest cards, badges, glows)
+- HP bar uses a two-layer ghost-drain technique: `.hp-main` snaps fast, `.hp-ghost` (white) drains slowly behind it
+- Combat numbers are `.floater` + `.floater-damage` / `.floater-crit` (DMG ≥ 19) / `.floater-heal`; horizontal spread comes from the `index` prop, tilt via `--floater-tilt`
+- All keyframe animations are in `src/index.css` (`@layer utilities`); component classes in `@layer components`
 
 ## Adding New Features
 
@@ -154,7 +156,7 @@ Previously `isWinner !== null` and `isWinner !== true` were used instead of `isW
 3. All types go in `src/types.ts`
 4. All utilities go in `src/utils/`
 5. All CSS goes in `src/index.css`
-6. After changes, run `bun x biome check` and `bun run build` to verify
+6. After changes, run `bun run typecheck`, `bun x biome check`, and `bun run build` to verify
 7. Run `bun x biome format --write` to auto-format code
 8. Update this AGENTS.md if architecture changes
 
@@ -197,3 +199,6 @@ Uses **Husky v9** + **commitlint** + **Biome**
 - **Bun lockfile**: `bun.lock` is the lockfile (not `package-lock.json`). Commit `bun.lock` to git.
 - **commitlint config**: Must be `commitlint.config.cjs` (not `.js`) because package.json has `"type": "module"`
 - **TypeScript**: `tsconfig.json` has strict mode. Check `noUnusedLocals` and `noUnusedParameters`.
+- **CSS not applied**: `index.html` must reference `/src/main.tsx` (the entry that imports `index.css`). Keep exactly one `vite.config.ts` (with the Tailwind plugin) — a stale `vite.config.js` without the plugin will shadow it and break Tailwind.
+- **Callback prop types**: `onAddTask`/`onToggleTask`/`onHeal` use `playerNum: 1 | 2` (not `number`), matching the hook signatures.
+- **`initialState` shape**: `src/utils/constants.ts` types it as `GameState`, so new `Player` fields must be added there too.

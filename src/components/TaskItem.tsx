@@ -7,37 +7,68 @@ export function TaskItem({
   onToggle,
   disabled,
 }: TaskItemProps) {
+  const actionable = !task.completed && isTurn && !disabled;
+
+  const strike = () => {
+    if (actionable) onToggle(playerNum, task.id);
+  };
+
   return (
     <div
-      className={`flex items-center gap-3 p-3 bg-white/[0.03] border border-[#2a2a4a] rounded-xl transition-all cursor-pointer animate-slide-in ${task.completed ? "opacity-50 border-[rgba(74,222,128,0.3)]" : ""} ${!isTurn ? "opacity-40 pointer-events-none" : ""}`}
+      onClick={strike}
+      className={`group relative flex items-center gap-3 p-3 rounded-xl border-2 bg-black/40 animate-slide-in overflow-hidden ${
+        task.completed
+          ? "border-[rgba(74,222,128,0.4)] opacity-60"
+          : actionable
+            ? "border-[var(--player-color)] cursor-pointer hover:-translate-y-[2px] hover:shadow-[0_6px_20px_var(--player-glow)]"
+            : "border-[#2a2a4a] opacity-50"
+      } transition-all duration-150`}
     >
-      <label className="task-checkbox relative w-[22px] h-[22px] flex-shrink-0 cursor-pointer">
-        <input
-          type="checkbox"
-          checked={task.completed}
-          onChange={() =>
-            !task.completed &&
-            isTurn &&
-            !disabled &&
-            onToggle(playerNum, task.id)
-          }
-          disabled={task.completed || !isTurn || disabled}
-          className="hidden"
-        />
-        <span className="w-[22px] h-[22px] border-2 border-[#2a2a4a] rounded-[6px] flex items-center justify-center transition-all" />
-      </label>
-      <div className="flex-1 flex items-center gap-[10px] min-w-0">
-        <span className="text-sm text-white whitespace-nowrap overflow-hidden text-overflow-ellipsis">
+      {/* Strike button */}
+      <button
+        type="button"
+        onClick={(e) => {
+          e.stopPropagation();
+          strike();
+        }}
+        disabled={!actionable}
+        title={task.completed ? "Already struck" : "Strike to attack!"}
+        className={`w-10 h-10 flex-shrink-0 rounded-lg border-2 text-lg font-black flex items-center justify-center transition-all ${
+          task.completed
+            ? "border-[#4ade80] bg-[#4ade80]/20 text-[#4ade80]"
+            : actionable
+              ? "border-[var(--player-color)] bg-[var(--player-color)]/15 text-white group-hover:scale-110 group-hover:shadow-[0_0_14px_var(--player-glow)]"
+              : "border-[#2a2a4a] bg-white/5 text-[#8a8aa0]"
+        } disabled:cursor-not-allowed`}
+      >
+        {task.completed ? "✓" : "⚔"}
+      </button>
+
+      <div className="flex-1 flex items-center gap-2 min-w-0">
+        <span
+          className={`text-sm font-semibold truncate ${
+            task.completed ? "line-through text-[#8a8aa0]" : "text-white"
+          }`}
+        >
           {task.text}
         </span>
-        <span className="text-[12px] font-bold text-[#f87171] bg-[rgba(248,113,113,0.15)] px-2 py-0.5 rounded-[6px] font-mono flex-shrink-0">
-          ⚔ {task.damage} DMG
-        </span>
       </div>
-      {task.completed && (
-        <span className="text-[11px] font-bold text-[#4ade80] bg-[rgba(74,222,128,0.15)] px-2 py-0.5 rounded-[6px] font-mono flex-shrink-0">
-          DONE
+
+      {/* Power badge */}
+      <span className="text-[12px] font-black italic text-[#fecaca] bg-gradient-to-b from-[#ef4444]/40 to-[#7f1d1d]/40 border border-[#ef4444]/50 px-2 py-1 rounded-lg font-mono flex-shrink-0 shadow-[0_2px_0_rgba(0,0,0,0.5)]">
+        ⚔{task.damage}
+      </span>
+
+      {task.completed ? (
+        <span className="text-[10px] font-black tracking-wider text-[#4ade80] bg-[#4ade80]/15 border border-[#4ade80]/40 px-2 py-1 rounded-lg flex-shrink-0">
+          HIT!
         </span>
+      ) : (
+        actionable && (
+          <span className="text-[10px] font-black tracking-wider text-[var(--player-color)] bg-white/5 border border-[var(--player-color)]/50 px-2 py-1 rounded-lg flex-shrink-0 animate-pulse-glow">
+            READY
+          </span>
+        )
       )}
     </div>
   );

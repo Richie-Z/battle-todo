@@ -1,10 +1,12 @@
+import { useEffect, useRef, useState } from "react";
 import type { BattleSideProps } from "../types";
 import { Floater } from "./Floater";
 import { TaskItem } from "./TaskItem";
 
+const LOW_HP_THRESHOLD = 30;
+
 export function BattleSide({
   player,
-  _opponent,
   playerNum,
   isTurn,
   isWinner,
@@ -18,10 +20,43 @@ export function BattleSide({
   floaters,
 }: BattleSideProps) {
   const hasPendingTasks = player.tasks.some((t) => !t.completed);
+  const pendingCount = player.tasks.filter((t) => !t.completed).length;
+  const isKO = player.hp <= 0;
+  const isLowHp = !isKO && player.hp <= LOW_HP_THRESHOLD;
+  const fighter = playerNum === 1 ? "🥷" : "🤖";
+
+  // Flash + shake the card when a new damage/heal floater lands on this side.
+  const [hitFlash, setHitFlash] = useState(false);
+  const [healFlash, setHealFlash] = useState(false);
+  const seenFloaterIds = useRef<Set<string>>(new Set());
+
+  useEffect(() => {
+    const fresh = floaters.filter((f) => !seenFloaterIds.current.has(f.id));
+    if (fresh.length === 0) return;
+    fresh.forEach((f) => {
+      seenFloaterIds.current.add(f.id);
+    });
+    if (fresh.some((f) => f.type !== "heal")) {
+      setHitFlash(true);
+      const t = setTimeout(() => setHitFlash(false), 450);
+      return () => clearTimeout(t);
+    }
+    if (fresh.some((f) => f.type === "heal")) {
+      setHealFlash(true);
+      const t = setTimeout(() => setHealFlash(false), 450);
+      return () => clearTimeout(t);
+    }
+  }, [floaters]);
 
   return (
     <div
-      className={`player-panel relative w-[45%] bg-[#16162a] border border-[#2a2a4a] rounded-2xl p-6 transition-all overflow-hidden ${playerNum === 2 ? "border-l-[3px]" : ""} ${isTurn ? "border-[var(--player-color)] shadow-[0_0_30px_var(--player-glow),inset_0_0_30px_rgba(0,0,0,0.2)]" : ""} ${isWinner ? "border-[#fbbf24] shadow-[0_0_40px_rgba(251,191,36,0.4)] animate-winner-celebrate" : ""}`}
+      className={`relative w-full lg:w-[45%] rounded-2xl border-2 p-5 transition-all duration-300 overflow-hidden bg-gradient-to-b from-[#1b1b33] to-[#121222] ${
+        isKO
+          ? "border-[#3a3a55] grayscale"
+          : isTurn
+            ? "border-[var(--player-color)] shadow-[0_0_35px_var(--player-glow)] -translate-y-1"
+            : "border-[#2a2a4a] opacity-90"
+      } ${isWinner ? "border-[#fbbf24] shadow-[0_0_45px_rgba(251,191,36,0.5)] animate-winner-celebrate" : ""}`}
       style={
         {
           "--player-color": player.color,
@@ -29,70 +64,146 @@ export function BattleSide({
         } as React.CSSProperties
       }
     >
-      <div className="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-[var(--player-color)] to-transparent opacity-0 transition-opacity duration-300" />
+      {/* Hit / heal flashes */}
+      {hitFlash && !isKO && (
+        <div className="hit-flash-overlay absolute inset-0 bg-red-500 pointer-events-none z-30 rounded-2xl" />
+      )}
+      {healFlash && (
+        <div className="hit-flash-overlay absolute inset-0 bg-green-400 pointer-events-none z-30 rounded-2xl" />
+      )}
+      {/* Top glow strip */}
+      <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-[var(--player-color)] to-transparent" />
 
-      <div className="flex items-center gap-4 mb-5">
-        <div
-          className="w-14 h-14 rounded-xl flex items-center justify-center text-xl font-bold text-white shadow-[0_4px_15px_rgba(0,0,0,0.3)]"
-          style={{ background: player.color }}
-        >
-          {player.name.charAt(0)}
+      {/* K.O. stamp */}
+      {isKO && (
+        <div className="absolute inset-0 z-30 flex items-center justify-center pointer-events-none">
+          <span className="text-6xl font-black italic text-red-500 -rotate-12 border-4 border-red-500 rounded-xl px-4 py-1 bg-black/60">
+            K.O.
+          </span>
         </div>
-        <div className="flex-1">
-          <h2 className="text-2xl font-bold text-white mb-2">{player.name}</h2>
-          <div className="flex flex-col gap-1.5">
-            <div className="w-full h-3 bg-white/8 rounded-3xl overflow-hidden relative">
-              <div
-                className="h-full rounded-3xl transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)]"
-                style={{
-                  width: getHpWidth(player.hp, player.maxHp),
-                  background: getHpColor(player.hp, player.maxHp),
-                }}
-              />
-            </div>
-            <span className="text-xs font-semibold text-[#8a8aa0] font-mono">
-              {player.hp} / {player.maxHp}
+      )}
+
+      {/* Fighter header */}
+      <div className="flex items-center gap-4 mb-4">
+        <div className="relative flex-shrink-0">
+          <div
+            className={`w-16 h-16 rounded-2xl flex items-center justify-center text-3xl border-2 border-[var(--player-color)] shadow-[0_4px_0_rgba(0,0,0,0.6),0_0_18px_var(--player-glow)] bg-black/50 ${hitFlash ? "animate-hurt" : isTurn && !isKO ? "animate-idle-bob" : ""}`}
+          >
+            {fighter}
+          </div>
+          <div
+            className="absolute -bottom-2 -right-2 w-7 h-7 rounded-lg flex items-center justify-center text-sm font-black text-white border border-black/60"
+            style={{ background: player.color }}
+          >
+            {playerNum}
+          </div>
+        </div>
+
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2 flex-wrap">
+            <h2 className="text-xl font-black italic tracking-wide text-white truncate uppercase">
+              {player.name}
+            </h2>
+            {isTurn && !isWinner && !isKO && (
+              <span
+                className="text-[10px] font-black tracking-widest px-2 py-1 rounded-md text-black animate-pulse-glow"
+                style={{ background: player.color }}
+              >
+                YOUR MOVE
+              </span>
+            )}
+            {isWinner && (
+              <span className="text-[10px] font-black tracking-widest px-2 py-1 rounded-md bg-[#fbbf24] text-black">
+                WINNER
+              </span>
+            )}
+          </div>
+          <div className="mt-1 flex items-baseline gap-1 font-mono">
+            <span
+              className={`text-2xl font-black ${isLowHp ? "text-[#f87171] animate-danger-blink" : "text-white"}`}
+            >
+              {player.hp}
             </span>
+            <span className="text-xs font-bold text-[#8a8aa0]">
+              / {player.maxHp} HP
+            </span>
+            {isLowHp && (
+              <span className="ml-1 text-[10px] font-black text-[#f87171] tracking-widest animate-danger-blink">
+                ⚠ LOW HP!
+              </span>
+            )}
           </div>
         </div>
       </div>
 
-      <div className="text-[11px] text-[#8a8aa0] text-center py-1.5 bg-white/[0.03] rounded-lg mb-3 font-normal italic tracking-[0.3px]">
-        <span>Type a task → press Enter → check the box to attack!</span>
+      {/* HP bar with ghost drain */}
+      <div
+        className={`relative h-6 rounded-lg bg-black/70 border border-black overflow-hidden mb-4 ${isLowHp ? "shadow-[0_0_12px_rgba(248,113,113,0.7)]" : ""}`}
+      >
+        {/* Ghost (delayed drain) */}
+        <div
+          className="hp-ghost absolute inset-y-0 left-0 bg-white/80"
+          style={{ width: getHpWidth(player.hp, player.maxHp) }}
+        />
+        {/* Main bar */}
+        <div
+          className="hp-main absolute inset-y-0 left-0"
+          style={{
+            width: getHpWidth(player.hp, player.maxHp),
+            background: getHpColor(player.hp, player.maxHp),
+          }}
+        />
+        {/* Segments */}
+        <div
+          className="absolute inset-0"
+          style={{
+            backgroundImage:
+              "repeating-linear-gradient(90deg, transparent 0, transparent 9%, rgba(0,0,0,0.55) 9%, rgba(0,0,0,0.55) 10%)",
+          }}
+        />
+        {/* Shine sweep */}
+        <div className="absolute inset-y-0 w-1/3 bg-gradient-to-r from-transparent via-white/40 to-transparent hp-shine" />
       </div>
 
-      <div className="absolute top-[80px] left-0 right-0 bottom-[200px] pointer-events-none overflow-hidden">
-        {floaters.map((f) => (
-          <Floater key={f.id} value={f.value} type={f.type} />
+      {/* Floating combat numbers */}
+      <div className="absolute left-0 right-0 top-0 h-44 pointer-events-none overflow-hidden z-20">
+        {floaters.map((f, i) => (
+          <Floater key={f.id} value={f.value} type={f.type} index={i} />
         ))}
       </div>
 
-      <div className="flex gap-2 mb-5">
+      {/* Quest input */}
+      <div className="flex gap-2 mb-4">
         <input
           type="text"
           value={newTask}
           onChange={(e) => setNewTask(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && onAddTask(playerNum)}
-          placeholder={`Task for ${player.name}... (check box to attack!)`}
-          className="flex-1 bg-white/[0.08] border border-[rgba(255,255,255,0.15)] rounded-xl p-3 text-white text-sm outline-none transition-all"
-          disabled={isWinner}
+          placeholder={`New quest for ${player.name}...`}
+          className="flex-1 bg-black/50 border-2 border-[#2a2a4a] rounded-xl px-3 py-2.5 text-white text-sm font-semibold outline-none transition-all placeholder:text-[#8a8aa0] placeholder:font-normal focus:border-[var(--player-color)] focus:shadow-[0_0_12px_var(--player-glow)] disabled:opacity-50"
+          disabled={isWinner || isKO}
         />
         <button
           type="button"
-          className="w-11 h-11 rounded-xl border border-[var(--player-color)] bg-white/[0.05] text-[var(--player-color)] text-[22px] font-bold cursor-pointer transition-all hover:bg-[var(--player-color)] hover:text-[#0d0d1a] hover:scale-105 disabled:opacity-30 disabled:cursor-not-allowed"
           onClick={() => onAddTask(playerNum)}
-          disabled={!newTask.trim() || isWinner}
-          title="Add task and deal damage on check"
+          disabled={!newTask.trim() || isWinner || isKO}
+          title="Add quest (strike it to attack!)"
+          className="px-4 rounded-xl border-b-4 font-black text-sm text-white transition-all active:translate-y-[2px] active:border-b-0 disabled:opacity-30 disabled:cursor-not-allowed disabled:active:translate-y-0 disabled:active:border-b-4 border-black/60"
+          style={{ background: player.color }}
         >
-          ⚔
+          ＋ QUEST
         </button>
       </div>
 
-      <div className="flex flex-col gap-2 max-h-[350px] overflow-y-auto pr-1">
+      {/* Quest list */}
+      <div className="flex flex-col gap-2 max-h-[320px] overflow-y-auto pr-1 mb-4">
         {player.tasks.length === 0 ? (
-          <p className="text-[#8a8aa0] text-sm text-center py-[30px] italic">
-            No tasks yet. Add one above!
-          </p>
+          <div className="border-2 border-dashed border-[#2a2a4a] rounded-xl py-6 text-center">
+            <div className="text-2xl mb-1">📜</div>
+            <p className="text-[#8a8aa0] text-sm italic">
+              No quests. Add one to arm an attack!
+            </p>
+          </div>
         ) : (
           player.tasks.map((task) => (
             <TaskItem
@@ -101,25 +212,26 @@ export function BattleSide({
               playerNum={playerNum}
               isTurn={isTurn}
               onToggle={onToggleTask}
-              disabled={isWinner}
+              disabled={isWinner || isKO}
             />
           ))
         )}
       </div>
 
+      {/* Heal */}
       <button
         type="button"
-        className="w-full mt-4 py-3 rounded-xl border border-[#4ade80] bg-[rgba(74,222,128,0.1)] text-[#4ade80] text-sm font-bold cursor-pointer transition-all disabled:opacity-30 disabled:cursor-not-allowed hover:bg-[rgba(74,222,128,0.25)] hover:-translate-y-[1px] hover:shadow-[0_4px_15px_rgba(74,222,128,0.2)]"
         onClick={() => onHeal(playerNum)}
-        disabled={!isTurn || isWinner || hasPendingTasks}
+        disabled={!isTurn || isWinner || isKO || hasPendingTasks}
+        className="w-full py-3 rounded-xl border-b-4 border-[#14532d] bg-gradient-to-b from-[#4ade80] to-[#16a34a] text-[#052e16] text-sm font-black tracking-wider transition-all active:translate-y-[2px] active:border-b-0 disabled:opacity-40 disabled:cursor-not-allowed disabled:active:translate-y-0 disabled:active:border-b-4 hover:brightness-110"
       >
         {!isTurn
-          ? "Wait..."
-          : isWinner
-            ? "Game Over"
+          ? "⏳ WAIT FOR YOUR TURN"
+          : isWinner || isKO
+            ? "💀 GAME OVER"
             : hasPendingTasks
-              ? `Complete ${player.tasks.filter((t) => !t.completed).length} task(s) first`
-              : "💚 Heal (End Turn)"}
+              ? `⚔ FINISH ${pendingCount} QUEST${pendingCount > 1 ? "S" : ""} TO HEAL`
+              : "💚 HEAL + END TURN"}
       </button>
     </div>
   );
