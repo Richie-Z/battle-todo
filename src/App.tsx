@@ -157,20 +157,22 @@ export default function App() {
       </div>
 
       {/* Header */}
-      <header className="relative z-10 flex items-center justify-between gap-3 px-5 py-4 border-b-2 border-[#2a2a4a] bg-[#0d0d1a]/85 backdrop-blur-xl">
-        <div className="flex items-center gap-3">
-          <span className="text-3xl animate-idle-bob">⚔️</span>
-          <div>
-            <h1 className="title-chrome text-3xl md:text-4xl font-black italic tracking-tight leading-none">
+      <header className="relative z-10 flex items-center justify-between gap-2 px-4 sm:px-5 py-4 border-b-2 border-[#2a2a4a] bg-[#0d0d1a]/85 backdrop-blur-xl">
+        <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+          <span className="text-2xl sm:text-3xl animate-idle-bob flex-shrink-0">
+            ⚔️
+          </span>
+          <div className="min-w-0">
+            <h1 className="title-chrome text-2xl sm:text-3xl md:text-4xl font-black italic tracking-tight leading-none truncate">
               BATTLE TODO
             </h1>
-            <p className="text-[10px] font-black tracking-[4px] text-[#8a8aa0] mt-1">
+            <p className="text-[10px] font-black tracking-[4px] text-[#8a8aa0] mt-1 truncate">
               TODO ARENA
             </p>
           </div>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-shrink-0">
           <span className="hidden sm:inline-block text-xs font-black tracking-widest px-3 py-2 rounded-lg bg-[#fbbf24]/15 border-2 border-[#fbbf24]/60 text-[#fbbf24]">
             ROUND {round}
           </span>
@@ -253,7 +255,7 @@ export default function App() {
         <div className="fixed inset-0 z-40 flex items-center justify-center pointer-events-none">
           <div className="animate-turn-banner text-center">
             <div
-              className="text-5xl md:text-7xl font-black italic tracking-tight"
+              className="text-4xl sm:text-5xl md:text-7xl font-black italic tracking-tight px-4"
               style={{
                 color: turnBanner === 1 ? "#ff6b6b" : "#4ecdc4",
                 textShadow: "0 4px 0 rgba(0,0,0,0.8), 0 0 40px currentColor",
@@ -349,7 +351,7 @@ export default function App() {
           <div className="text-center animate-pop-in relative">
             <div className="text-7xl mb-2 animate-idle-bob">🏆</div>
             <h2
-              className="text-6xl md:text-7xl font-black italic tracking-tight mb-2"
+              className="text-5xl sm:text-6xl md:text-7xl font-black italic tracking-tight mb-2"
               style={{
                 color: winnerColor,
                 textShadow: "0 4px 0 rgba(0,0,0,0.8), 0 0 50px currentColor",
