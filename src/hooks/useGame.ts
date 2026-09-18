@@ -44,7 +44,6 @@ export function useGame() {
   const [screenShake, setScreenShake] = useState<boolean>(false);
   const [showSettings, setShowSettings] = useState<boolean>(false);
 
-  const logEndRef = useRef<HTMLDivElement>(null);
   const shakeTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(
     undefined,
   );
@@ -60,10 +59,6 @@ export function useGame() {
       player2Name,
     });
   }, [state, player1Name, player2Name]);
-
-  useEffect(() => {
-    logEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, []);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -264,7 +259,6 @@ export function useGame() {
     screenShake,
     showSettings,
     setShowSettings,
-    logEndRef,
     addTask,
     toggleTask,
     healPlayer,

@@ -49,7 +49,6 @@ export default function App() {
     screenShake,
     showSettings,
     setShowSettings,
-    logEndRef,
     addTask,
     toggleTask,
     healPlayer,
@@ -433,7 +432,6 @@ export default function App() {
                 </span>
               </div>
             ))}
-          <div ref={logEndRef} />
         </div>
       </aside>
     </div>
