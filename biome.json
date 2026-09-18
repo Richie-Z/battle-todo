@@ -29,6 +29,6 @@
     "useIgnoreFile": true
   },
   "files": {
-    "includes": ["**/*.{jsx,js,tsx,ts,css,json,html}"]
+    "includes": ["**/*.{tsx,ts,jsx,js,css,json,html}"]
   }
 }

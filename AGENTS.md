@@ -2,11 +2,11 @@
 
 ## Project Overview
 
-**Battle Todo** is a React-based 2-player battle todo list game. Players add tasks, check them to deal damage to the opponent, and try to reduce the opponent's HP to zero.
+**Battle Todo** is a React + TypeScript 2-player battle todo list game. Players add tasks, check them to deal damage to the opponent, and try to reduce the opponent's HP to zero.
 
 - **Runtime**: Bun 1.4 (via mise)
 - **Linter/Formatter**: Biome 2.x (replaces oxlint)
-- **Framework**: React 19 via Vite
+- **Framework**: React 19 + TypeScript via Vite
 - **Location**: `~/Documents/Programming/battle-todo`
 - **Build command**: `bun run build`
 - **Dev command**: `bun run dev`
@@ -16,6 +16,25 @@
 - **Package manager**: Bun (`bun install`, `bun add`, `bun x`)
 
 ## Architecture
+
+### File Structure
+
+```
+src/
+├── App.tsx                    # Main App component
+├── main.tsx                   # Entry point
+├── index.css                  # Global styles, CSS custom properties, keyframes
+├── types.ts                   # All TypeScript interfaces (Player, Task, GameState, etc.)
+├── utils/
+│   ├── helpers.ts             # generateId, saveState, loadState, createPlayer
+│   └── constants.ts           # STORAGE_KEY, initialState, HP color constants, timeouts
+├── hooks/
+│   └── useGame.ts             # Custom hook: all game logic and state management
+└── components/
+    ├── BattleSide.tsx         # Player panel (input, tasks, heal button)
+    ├── TaskItem.tsx           # Individual task with checkbox
+    └── Floater.tsx            # Damage/heal floating number animation
+```
 
 ### Component Hierarchy
 
@@ -35,18 +54,28 @@ App
 
 | File | Purpose |
 |------|---------|
-| `src/App.jsx` | Main game logic, all state management, all components |
-| `src/App.css` | All styling (~750 lines) |
-| `src/index.css` | Global styles, CSS custom properties, keyframe animations |
-| `src/main.jsx` | Entry point |
-| `index.html` | HTML template |
-| `vite.config.js` | Vite configuration |
-| `package.json` | Dependencies and scripts |
-| `commitlint.config.cjs` | Commitlint configuration |
+| `src/App.tsx` | Main App component - orchestrates everything |
+| `src/hooks/useGame.ts` | Custom hook with all game logic (addTask, toggleTask, healPlayer, etc.) |
+| `src/types.ts` | All TypeScript interfaces |
+| `src/components/BattleSide.tsx` | Player panel component |
+| `src/components/TaskItem.tsx` | Task item with checkbox |
+| `src/components/Floater.tsx` | Damage/heal floating number |
+| `src/utils/helpers.ts` | Utility functions |
+| `src/utils/constants.ts` | Constants |
+| `src/index.css` | Global CSS |
+| `src/main.tsx` | Entry point |
+| `biome.json` | Biome lint/format config |
+| `tsconfig.json` | TypeScript config |
+| `vite.config.ts` | Vite config |
+| `commitlint.config.cjs` | Commitlint config |
 
-### All code is in App.jsx
+### Clean Code Principles
 
-Everything (App, BattleSide, TaskItem, Floater components) is in a single file `src/App.jsx`. No separate component files.
+- **Custom Hook**: `useGame()` encapsulates all game state and logic
+- **Type Safety**: All interfaces defined in `src/types.ts`
+- **Component Separation**: BattleSide, TaskItem, Floater each in their own file
+- **Utility Separation**: helpers.ts (functions) and constants.ts (values)
+- **Single Responsibility**: Each file has a clear purpose
 
 ## Game Mechanics
 
@@ -65,13 +94,14 @@ Everything (App, BattleSide, TaskItem, Floater components) is in a single file `
 - Heal requires no pending tasks (prevents heal stall)
 
 ### State Management
-All game state is in `useState` in `App`. State includes:
-- `player1`, `player2`: objects with `{name, hp, maxHp, tasks, color, glow}`
+All game state is in `useGame()` custom hook. State includes:
+- `player1`, `player2`: Player objects with `{name, hp, maxHp, tasks, color, glow}`
 - `currentTurn`: 1 or 2
 - `winner`: player number or null
 - `battleLog`: array of action objects
 - `floaters`: array of damage/heal number objects
 - `screenShake`: boolean
+- `showSettings`: boolean
 - `player1Name`, `player2Name`: separate state for settings
 
 ### LocalStorage Persistence
@@ -91,13 +121,23 @@ All game state is in `useState` in `App`. State includes:
 In `toggleTask`, `damage` is extracted from the task before `setState`, then used in `setFloaters` after. This avoids stale closures.
 
 ### Floater cleanup
-A `setInterval` in a `useEffect` removes floaters older than 1200ms to prevent memory leaks.
+A `setInterval` in `useGame()` removes floaters older than 1200ms to prevent memory leaks.
 
 ### Screen shake
 `shakeTimerRef` manages the shake timeout. `resetGame` clears it to avoid state updates after unmount.
 
 ### isWinner boolean bug (history)
 Previously `isWinner !== null` and `isWinner !== true` were used instead of `isWinner`. This caused all inputs/buttons to be disabled because `false !== null` and `false !== true` are both `true`. Fixed to `disabled={isWinner}`.
+
+## TypeScript Conventions
+
+- Strict mode enabled in `tsconfig.json`
+- `noUnusedLocals` and `noUnusedParameters` enabled
+- All types defined in `src/types.ts`
+- Use `type` keyword for type-only imports where applicable
+- `export default function App()` pattern
+- Custom hooks prefixed with `use`
+- React types from `@types/react` and `@types/react-dom`
 
 ## CSS Conventions
 
@@ -109,12 +149,14 @@ Previously `isWinner !== null` and `isWinner !== true` were used instead of `isW
 
 ## Adding New Features
 
-1. All React component code goes in `src/App.jsx`
-2. All CSS goes in `src/App.css` (keyframes in `src/index.css`)
-3. Never create new component files - keep everything in App.jsx
-4. After changes, run `bun x biome check` and `bun run build` to verify
-5. Run `bun x biome format --write` to auto-format code
-6. Update this AGENTS.md if architecture changes
+1. All React component code goes in `src/components/`
+2. All game logic goes in `src/hooks/useGame.ts`
+3. All types go in `src/types.ts`
+4. All utilities go in `src/utils/`
+5. All CSS goes in `src/index.css`
+6. After changes, run `bun x biome check` and `bun run build` to verify
+7. Run `bun x biome format --write` to auto-format code
+8. Update this AGENTS.md if architecture changes
 
 ## Git Hooks
 
@@ -154,3 +196,4 @@ Uses **Husky v9** + **commitlint** + **Biome**
 - **Bun not found**: Use `mise run bun --version` or export `PATH="/home/u85/.local/share/mise/installs/bun/latest/bin:$PATH"`. Bun symlinks also available at `~/.local/bin/bun`
 - **Bun lockfile**: `bun.lock` is the lockfile (not `package-lock.json`). Commit `bun.lock` to git.
 - **commitlint config**: Must be `commitlint.config.cjs` (not `.js`) because package.json has `"type": "module"`
+- **TypeScript**: `tsconfig.json` has strict mode. Check `noUnusedLocals` and `noUnusedParameters`.
