@@ -136,6 +136,6 @@ Uses **Husky v9** + **commitlint**
 - **Floaters not showing**: Check that `setFloaters` is called outside `setState` callback
 - **Turn not switching**: Verify `currentTurn` is updated in the `setState` return object
 - **Heal not working**: Check `hasPendingTasks` - can only heal if all tasks are completed. Button text shows pending task count.
-- **Bun not found**: Use `mise run bun --version` or export `PATH="/home/u85/.local/share/mise/installs/bun/latest/bin:$PATH"`
+- **Bun not found**: Use `mise run bun --version` or export `PATH="/home/u85/.local/share/mise/installs/bun/latest/bin:$PATH"`. Bun symlinks also available at `~/.local/bin/bun`
 - **Bun lockfile**: `bun.lock` is the lockfile (not `package-lock.json`). Commit `bun.lock` to git.
 - **commitlint config**: Must be `commitlint.config.cjs` (not `.js`) because package.json has `"type": "module"`
