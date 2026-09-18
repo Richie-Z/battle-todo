@@ -108,12 +108,14 @@ A `setInterval` in a `useEffect` removes floaters older than 1200ms to prevent m
 
 ## Git Hooks
 
-- Hooks are in `.githooks/` directory
-- `pre-commit`: Runs `oxlint`, blocks commit if lint fails
-- `commit-msg`: Validates conventional commit format (`type(scope): description`)
-- Hooks are activated via `git config core.hooksPath .githooks`
-- Run `npm run prepare` to set up hooks on new clones
+Uses **Husky v9** + **commitlint**
+- **Husky**: `.husky/` directory with `pre-commit` and `commit-msg` hooks
+  - `pre-commit`: Runs `oxlint`, blocks commit if lint fails
+  - `commit-msg`: Runs `commitlint`, validates conventional commit format (`type(scope): description`)
+- **commitlint config**: `commitlint.config.cjs` (CommonJS due to `"type": "module"` in package.json)
+- Hooks auto-set up via `npm run prepare` (which runs `husky`)
 - Conventional commit types: feat, fix, docs, style, refactor, perf, test, build, ci, chore, revert
+- **Husky v9 deprecation**: The `_/husky.sh` sourcing line in hooks is deprecated but still works; will be removed in v10. To upgrade, replace hook files with: `#!/usr/bin/env sh\nnpx oxlint` (pre-commit) / `#!/usr/bin/env sh\nnpx commitlint --edit "$1"` (commit-msg)
 
 ## Updating Dependencies
 
