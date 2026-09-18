@@ -106,6 +106,21 @@ A `setInterval` in a `useEffect` removes floaters older than 1200ms to prevent m
 4. After changes, run `npx oxlint` and `npm run build` to verify
 5. Update this AGENTS.md if architecture changes
 
+## Git Hooks
+
+- Hooks are in `.githooks/` directory
+- `pre-commit`: Runs `oxlint`, blocks commit if lint fails
+- `commit-msg`: Validates conventional commit format (`type(scope): description`)
+- Hooks are activated via `git config core.hooksPath .githooks`
+- Run `npm run prepare` to set up hooks on new clones
+- Conventional commit types: feat, fix, docs, style, refactor, perf, test, build, ci, chore, revert
+
+## Updating Dependencies
+
+- Run `npm run update-deps` to update all deps to latest versions
+- Uses `npm-check-updates` (NCU) to bump versions in package.json, then `npm install`
+- Also run `npm install` after any package.json changes
+
 ## Common Issues
 
 - **Input disabled**: Check that `disabled={isWinner}` (not `!== null`) on all inputs/buttons
