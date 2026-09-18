@@ -1,0 +1,14 @@
+#!/usr/bin/env sh
+
+echo "🔍 Running pre-commit checks..."
+
+# Run lint
+echo "📋 Running oxlint..."
+npx oxlint
+if [ $? -ne 0 ]; then
+  echo "❌ Lint failed. Fix errors before committing."
+  exit 1
+fi
+
+echo "✅ All pre-commit checks passed!"
+exit 0
