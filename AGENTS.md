@@ -131,6 +131,9 @@ A `setInterval` in `useGame()` removes floaters older than 1200ms to prevent mem
 ### isWinner boolean bug (history)
 Previously `isWinner !== null` and `isWinner !== true` were used instead of `isWinner`. This caused all inputs/buttons to be disabled because `false !== null` and `false !== true` are both `true`. Fixed to `disabled={isWinner}`.
 
+### No page-level auto-scroll on mount (history)
+A `logEndRef.current?.scrollIntoView()` effect once ran on mount and yanked the whole page down to the combat feed on every load, hiding the header. It was removed entirely: the feed renders newest-first (`.slice().reverse()`), so no scroll pinning is needed. Rule: never `scrollIntoView` a page-level element on mount; if a scrollable panel ever needs pinning, scroll its inner container, not the page. When removing such behavior, also remove its now-dead API (`logEndRef` was dropped from the hook return and `App`) instead of leaving dead code.
+
 ## TypeScript Conventions
 
 - Strict mode enabled in `tsconfig.json`
@@ -157,8 +160,9 @@ Previously `isWinner !== null` and `isWinner !== true` were used instead of `isW
 4. All utilities go in `src/utils/`
 5. All CSS goes in `src/index.css`
 6. After changes, run `bun run typecheck`, `bun x biome check`, and `bun run build` to verify
-7. Run `bun x biome format --write` to auto-format code
-8. Update this AGENTS.md if architecture changes
+7. For UI bugs, verify visually, not just via DOM: serve with `bun run preview`, screenshot with headless Chromium (`chromium --headless --disable-gpu --no-sandbox --screenshot=...`), and compare. An element present in `--dump-dom` can still paint off-screen or invisible — the missing-header bug was only provable this way.
+8. Run `bun x biome format --write` to auto-format code
+9. Update this AGENTS.md if architecture changes
 
 ## Git Hooks
 
