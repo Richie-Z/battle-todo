@@ -5,3 +5,4 @@ dist/
 *.log
 .oxlintrc.json
 .husky/_/
+package-lock.json

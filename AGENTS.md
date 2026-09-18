@@ -4,11 +4,13 @@
 
 **Battle Todo** is a React-based 2-player battle todo list game. Players add tasks, check them to deal damage to the opponent, and try to reduce the opponent's HP to zero.
 
+- **Runtime**: Bun 1.4 (via mise)
 - **Framework**: React 19 via Vite
 - **Location**: `~/Documents/Programming/battle-todo`
-- **Build command**: `npm run build`
-- **Dev command**: `npm run dev`
-- **Lint**: `npx oxlint`
+- **Build command**: `bun run build`
+- **Dev command**: `bun run dev`
+- **Lint**: `bun x oxlint`
+- **Package manager**: Bun (`bun install`, `bun add`, `bun x`)
 
 ## Architecture
 
@@ -37,6 +39,7 @@ App
 | `index.html` | HTML template |
 | `vite.config.js` | Vite configuration |
 | `package.json` | Dependencies and scripts |
+| `commitlint.config.cjs` | Commitlint configuration |
 
 ### All code is in App.jsx
 
@@ -76,7 +79,7 @@ All game state is in `useState` in `App`. State includes:
 ## Important Patterns & Gotchas
 
 ### `isWinner` is a boolean, NOT null
-`isWinner` comes from `state.winner === 1` or `state.winner === 2`. It is always a boolean (`true` or `false`). Use `disabled={isWinner}` NOT `disabled={isWinner !== null}`.
+`isWinner` comes from `state.winner === 1` or `state.winner === 2`. It is always boolean (`true` or `false`). Use `disabled={isWinner}` NOT `disabled={isWinner !== null}`.
 
 ### `setFloaters` must NOT be inside `setState` callback
 `setFloaters` is called outside the `setState` callback in `toggleTask` and `healPlayer`. React's `setState` callback must be pure.
@@ -89,6 +92,9 @@ A `setInterval` in a `useEffect` removes floaters older than 1200ms to prevent m
 
 ### Screen shake
 `shakeTimerRef` manages the shake timeout. `resetGame` clears it to avoid state updates after unmount.
+
+### isWinner boolean bug (history)
+Previously `isWinner !== null` and `isWinner !== true` were used instead of `isWinner`. This caused all inputs/buttons to be disabled because `false !== null` and `false !== true` are both `true`. Fixed to `disabled={isWinner}`.
 
 ## CSS Conventions
 
@@ -103,25 +109,25 @@ A `setInterval` in a `useEffect` removes floaters older than 1200ms to prevent m
 1. All React component code goes in `src/App.jsx`
 2. All CSS goes in `src/App.css` (keyframes in `src/index.css`)
 3. Never create new component files - keep everything in App.jsx
-4. After changes, run `npx oxlint` and `npm run build` to verify
+4. After changes, run `bun x oxlint` and `bun run build` to verify
 5. Update this AGENTS.md if architecture changes
 
 ## Git Hooks
 
 Uses **Husky v9** + **commitlint**
 - **Husky**: `.husky/` directory with `pre-commit` and `commit-msg` hooks
-  - `pre-commit`: Runs `oxlint`, blocks commit if lint fails
-  - `commit-msg`: Runs `commitlint`, validates conventional commit format (`type(scope): description`)
+  - `pre-commit`: Runs `bun x oxlint`, blocks commit if lint fails
+  - `commit-msg`: Runs `bun x commitlint --edit "$1"`, validates conventional commit format (`type(scope): description`)
 - **commitlint config**: `commitlint.config.cjs` (CommonJS due to `"type": "module"` in package.json)
-- Hooks auto-set up via `npm run prepare` (which runs `husky`)
+- Hooks auto-set up via `bun run prepare` (which runs `husky`)
 - Conventional commit types: feat, fix, docs, style, refactor, perf, test, build, ci, chore, revert
-- **Husky v9 deprecation**: The `_/husky.sh` sourcing line in hooks is deprecated but still works; will be removed in v10. To upgrade, replace hook files with: `#!/usr/bin/env sh\nnpx oxlint` (pre-commit) / `#!/usr/bin/env sh\nnpx commitlint --edit "$1"` (commit-msg)
+- **Husky v9 deprecation**: The `_/husky.sh` sourcing line in hooks is deprecated but still works; will be removed in v10. To upgrade, replace hook files with: `#!/usr/bin/env sh\nbun x oxlint` (pre-commit) / `#!/usr/bin/env sh\nbun x commitlint --edit "$1"` (commit-msg)
 
 ## Updating Dependencies
 
-- Run `npm run update-deps` to update all deps to latest versions
-- Uses `npm-check-updates` (NCU) to bump versions in package.json, then `npm install`
-- Also run `npm install` after any package.json changes
+- Run `bun run update-deps` to update all deps to latest versions
+- Uses `npm-check-updates` (NCU) to bump versions in package.json, then `bun install`
+- Also run `bun install` after any package.json changes
 
 ## Common Issues
 
@@ -130,3 +136,6 @@ Uses **Husky v9** + **commitlint**
 - **Floaters not showing**: Check that `setFloaters` is called outside `setState` callback
 - **Turn not switching**: Verify `currentTurn` is updated in the `setState` return object
 - **Heal not working**: Check `hasPendingTasks` - can only heal if all tasks are completed. Button text shows pending task count.
+- **Bun not found**: Use `mise run bun --version` or export `PATH="/home/u85/.local/share/mise/installs/bun/latest/bin:$PATH"`
+- **Bun lockfile**: `bun.lock` is the lockfile (not `package-lock.json`). Commit `bun.lock` to git.
+- **commitlint config**: Must be `commitlint.config.cjs` (not `.js`) because package.json has `"type": "module"`
