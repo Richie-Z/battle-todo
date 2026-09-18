@@ -1,8 +1,29 @@
+import type { GameState } from "../types";
+
 export const STORAGE_KEY = "battle-todo-state";
 
-export const initialState = {
-  player1: { name: "Player 1", hp: 100, maxHp: 100, tasks: [] },
-  player2: { name: "Player 2", hp: 100, maxHp: 100, tasks: [] },
+export const PLAYER1_COLOR = "#ff6b6b";
+export const PLAYER2_COLOR = "#4ecdc4";
+export const PLAYER1_GLOW = "rgba(255, 107, 107, 0.5)";
+export const PLAYER2_GLOW = "rgba(78, 205, 196, 0.5)";
+
+export const initialState: GameState = {
+  player1: {
+    name: "Player 1",
+    hp: 100,
+    maxHp: 100,
+    tasks: [],
+    color: PLAYER1_COLOR,
+    glow: PLAYER1_GLOW,
+  },
+  player2: {
+    name: "Player 2",
+    hp: 100,
+    maxHp: 100,
+    tasks: [],
+    color: PLAYER2_COLOR,
+    glow: PLAYER2_GLOW,
+  },
   currentTurn: 1,
   winner: null,
   battleLog: [],

@@ -51,27 +51,27 @@ export interface GameData {
 export interface FloaterProps {
   value: number;
   type?: string;
+  index?: number;
 }
 
 export interface TaskItemProps {
   task: Task;
-  playerNum: number;
+  playerNum: 1 | 2;
   isTurn: boolean;
-  onToggle: (playerNum: number, taskId: string) => void;
+  onToggle: (playerNum: 1 | 2, taskId: string) => void;
   disabled: boolean;
 }
 
 export interface BattleSideProps {
   player: Player;
-  opponent: Player;
   playerNum: 1 | 2;
   isTurn: boolean;
   isWinner: boolean;
   newTask: string;
   setNewTask: (value: string) => void;
-  onAddTask: (playerNum: number) => void;
-  onToggleTask: (playerNum: number, taskId: string) => void;
-  onHeal: (playerNum: number) => void;
+  onAddTask: (playerNum: 1 | 2) => void;
+  onToggleTask: (playerNum: 1 | 2, taskId: string) => void;
+  onHeal: (playerNum: 1 | 2) => void;
   getHpColor: (hp: number, maxHp: number) => string;
   getHpWidth: (hp: number, maxHp: number) => string;
   floaters: FloaterData[];

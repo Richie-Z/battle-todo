@@ -45,7 +45,9 @@ export function useGame() {
   const [showSettings, setShowSettings] = useState<boolean>(false);
 
   const logEndRef = useRef<HTMLDivElement>(null);
-  const shakeTimerRef = useRef<ReturnType<typeof setTimeout>>();
+  const shakeTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(
+    undefined,
+  );
 
   useEffect(() => {
     saveState({

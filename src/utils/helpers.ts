@@ -53,8 +53,3 @@ export function createPlayer(
     glow,
   };
 }
-
-export const PLAYER1_COLOR = "#ff6b6b";
-export const PLAYER2_COLOR = "#4ecdc4";
-export const PLAYER1_GLOW = "rgba(255, 107, 107, 0.5)";
-export const PLAYER2_GLOW = "rgba(78, 205, 196, 0.5)";

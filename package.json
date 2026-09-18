@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "bun run vite",
     "build": "bun run vite build",
+    "typecheck": "tsc --noEmit",
     "lint": "bun x biome check",
     "format": "bun x biome format --write",
     "format:check": "bun x biome format --check",
