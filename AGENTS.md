@@ -5,11 +5,14 @@
 **Battle Todo** is a React-based 2-player battle todo list game. Players add tasks, check them to deal damage to the opponent, and try to reduce the opponent's HP to zero.
 
 - **Runtime**: Bun 1.4 (via mise)
+- **Linter/Formatter**: Biome 2.x (replaces oxlint)
 - **Framework**: React 19 via Vite
 - **Location**: `~/Documents/Programming/battle-todo`
 - **Build command**: `bun run build`
 - **Dev command**: `bun run dev`
-- **Lint**: `bun x oxlint`
+- **Lint**: `bun x biome check`
+- **Format**: `bun x biome format --write`
+- **Format check**: `bun x biome format --check`
 - **Package manager**: Bun (`bun install`, `bun add`, `bun x`)
 
 ## Architecture
@@ -109,19 +112,31 @@ Previously `isWinner !== null` and `isWinner !== true` were used instead of `isW
 1. All React component code goes in `src/App.jsx`
 2. All CSS goes in `src/App.css` (keyframes in `src/index.css`)
 3. Never create new component files - keep everything in App.jsx
-4. After changes, run `bun x oxlint` and `bun run build` to verify
-5. Update this AGENTS.md if architecture changes
+4. After changes, run `bun x biome check` and `bun run build` to verify
+5. Run `bun x biome format --write` to auto-format code
+6. Update this AGENTS.md if architecture changes
 
 ## Git Hooks
 
-Uses **Husky v9** + **commitlint**
+Uses **Husky v9** + **commitlint** + **Biome**
 - **Husky**: `.husky/` directory with `pre-commit` and `commit-msg` hooks
-  - `pre-commit`: Runs `bun x oxlint`, blocks commit if lint fails
+  - `pre-commit`: Runs `bun x biome check`, blocks commit if lint fails
   - `commit-msg`: Runs `bun x commitlint --edit "$1"`, validates conventional commit format (`type(scope): description`)
 - **commitlint config**: `commitlint.config.cjs` (CommonJS due to `"type": "module"` in package.json)
+- **Biome config**: `biome.json` (linting + formatting)
 - Hooks auto-set up via `bun run prepare` (which runs `husky`)
 - Conventional commit types: feat, fix, docs, style, refactor, perf, test, build, ci, chore, revert
-- **Husky v9 deprecation**: The `_/husky.sh` sourcing line in hooks is deprecated but still works; will be removed in v10. To upgrade, replace hook files with: `#!/usr/bin/env sh\nbun x oxlint` (pre-commit) / `#!/usr/bin/env sh\nbun x commitlint --edit "$1"` (commit-msg)
+- **Husky v9 deprecation**: The `_/husky.sh` sourcing line in hooks is deprecated but still works; will be removed in v10.
+
+## Biome
+
+- Uses `@biomejs/biome` v2.x (installed via `bun add --dev @biomejs/biome`)
+- Config file: `biome.json`
+- `bun x biome check` — lint + format check
+- `bun x biome format --write` — auto-format code
+- `bun x biome format --check` — check formatting without modifying
+- A11y rules `noStaticElementInteractions`, `useKeyWithClickEvents`, `noLabelWithoutControl` are disabled (game UI has interactive divs)
+- `assist.source.organizeImports` is enabled (auto-sorts imports)
 
 ## Updating Dependencies
 
