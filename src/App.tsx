@@ -1,3 +1,16 @@
+import {
+  ArrowRight,
+  Flame,
+  Gamepad,
+  Heart,
+  RefreshCw,
+  ScrollText,
+  Settings,
+  Swords,
+  Trophy,
+  Volume2,
+  VolumeX,
+} from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { BattleSide } from "./components/BattleSide";
 import { useGame } from "./hooks/useGame";
@@ -162,9 +175,7 @@ export default function App() {
       {/* Header */}
       <header className="relative z-10 flex items-center justify-between gap-2 px-4 sm:px-5 py-4 border-b-2 border-[#2a2a4a] bg-[#0d0d1a]/85 backdrop-blur-xl">
         <div className="flex items-center gap-2 sm:gap-3 min-w-0">
-          <span className="text-2xl sm:text-3xl animate-idle-bob flex-shrink-0">
-            ⚔️
-          </span>
+          <Swords className="text-2xl sm:text-3xl text-[#ff6b6b] animate-idle-bob flex-shrink-0" />
           <div className="min-w-0">
             <h1 className="title-chrome text-2xl sm:text-3xl md:text-4xl font-black italic tracking-tight leading-none truncate">
               BATTLE TODO
@@ -185,7 +196,11 @@ export default function App() {
             title={muted ? "Unmute sounds" : "Mute sounds"}
             className="bg-[#16162a] border-2 border-[#2a2a4a] text-[#e0e0e8] w-11 h-11 rounded-xl text-lg cursor-pointer transition-all hover:border-[#fbbf24] active:translate-y-[2px]"
           >
-            {muted ? "🔇" : "🔊"}
+            {muted ? (
+              <VolumeX className="w-5 h-5" />
+            ) : (
+              <Volume2 className="w-5 h-5" />
+            )}
           </button>
           <button
             type="button"
@@ -196,7 +211,7 @@ export default function App() {
             title="Game settings"
             className="bg-[#16162a] border-2 border-[#2a2a4a] text-[#e0e0e8] w-11 h-11 rounded-xl text-lg cursor-pointer transition-all duration-300 hover:border-[#4ecdc4] hover:rotate-90 active:translate-y-[2px]"
           >
-            ⚙
+            <Settings className="w-5 h-5" />
           </button>
         </div>
       </header>
@@ -211,7 +226,8 @@ export default function App() {
             onClick={(e) => e.stopPropagation()}
           >
             <h2 className="text-xl font-black italic tracking-wide text-white">
-              🎮 GAME SETTINGS
+              <Gamepad className="w-5 h-5 mr-2" />
+              GAME SETTINGS
             </h2>
             <div className="flex flex-col gap-2">
               <label className="text-xs font-black text-[#ff6b6b] uppercase tracking-[2px]">
@@ -307,7 +323,8 @@ export default function App() {
                 className="text-[11px] font-black tracking-widest px-3 py-2 rounded-lg border-2 text-center whitespace-nowrap animate-pulse-glow bg-black/60"
                 style={{ borderColor: currentColor, color: currentColor }}
               >
-                ▶ {currentName}
+                <ArrowRight className="w-4 h-4 mr-1" />
+                {currentName}
               </div>
             )}
           </div>
@@ -352,7 +369,7 @@ export default function App() {
             }),
           )}
           <div className="text-center animate-pop-in relative">
-            <div className="text-7xl mb-2 animate-idle-bob">🏆</div>
+            <Trophy className="w-14 h-14 mb-2 animate-idle-bob text-[#fbbf24]" />
             <h2
               className="text-5xl sm:text-6xl md:text-7xl font-black italic tracking-tight mb-2"
               style={{
@@ -396,7 +413,8 @@ export default function App() {
               onClick={resetGame}
               className="px-14 py-4 rounded-2xl border-b-8 border-black/60 bg-gradient-to-b from-[#ff6b6b] to-[#4ecdc4] text-white text-xl font-black italic tracking-wide cursor-pointer transition-all hover:brightness-110 hover:-translate-y-[2px] active:translate-y-[4px] active:border-b-0"
             >
-              ↻ REMATCH!
+              <RefreshCw className="w-5 h-5 mr-2" />
+              REMATCH!
             </button>
           </div>
         </div>
@@ -405,12 +423,13 @@ export default function App() {
       {/* Combat feed */}
       <aside className="relative z-10 border-t-2 border-[#2a2a4a] bg-[#101024]/95 p-4 md:px-10 max-h-[190px] flex flex-col">
         <h3 className="text-[12px] font-black text-[#fbbf24] tracking-[3px] mb-2">
-          📜 COMBAT FEED
+          <ScrollText className="w-4 h-4 mr-1.5" />
+          COMBAT FEED
         </h3>
         <div className="flex-1 overflow-y-auto flex flex-col gap-1.5 pr-1">
           {state.battleLog.length === 0 && (
             <p className="text-[#8a8aa0] text-[13px] italic text-center py-4">
-              The arena is silent… add a quest and strike first! ⚔
+              The arena is silent… add a quest and strike first!
             </p>
           )}
           {state.battleLog
@@ -426,7 +445,11 @@ export default function App() {
                 }`}
               >
                 <span className="text-base flex-shrink-0">
-                  {entry.type === "damage" ? "💥" : "💚"}
+                  {entry.type === "damage" ? (
+                    <Flame className="w-4 h-4 text-[#f87171]" />
+                  ) : (
+                    <Heart className="w-4 h-4 text-[#4ade80]" />
+                  )}
                 </span>
                 <span className="text-[#8a8aa0] font-mono text-[11px] flex-shrink-0">
                   {new Date(entry.timestamp).toLocaleTimeString()}

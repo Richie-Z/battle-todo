@@ -1,3 +1,4 @@
+import { AlertTriangle, Clock, Heart, ScrollText, Swords } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import type { BattleSideProps } from "../types";
 import { Floater } from "./Floater";
@@ -23,7 +24,12 @@ export function BattleSide({
   const pendingCount = player.tasks.filter((t) => !t.completed).length;
   const isKO = player.hp <= 0;
   const isLowHp = !isKO && player.hp <= LOW_HP_THRESHOLD;
-  const fighter = playerNum === 1 ? "🥷" : "🤖";
+  const fighter =
+    playerNum === 1 ? (
+      <Swords className="text-3xl" />
+    ) : (
+      <Swords className="text-3xl" />
+    );
 
   // Flash + shake the card when a new damage/heal floater lands on this side.
   const [hitFlash, setHitFlash] = useState(false);
@@ -129,7 +135,8 @@ export function BattleSide({
             </span>
             {isLowHp && (
               <span className="ml-1 text-[10px] font-black text-[#f87171] tracking-widest animate-danger-blink">
-                ⚠ LOW HP!
+                <AlertTriangle className="w-3.5 h-3.5 ml-1 align-middle" /> LOW
+                HP!
               </span>
             )}
           </div>
@@ -199,7 +206,7 @@ export function BattleSide({
       <div className="flex flex-col gap-2 max-h-[320px] overflow-y-auto pr-1 mb-4">
         {player.tasks.length === 0 ? (
           <div className="border-2 border-dashed border-[#2a2a4a] rounded-xl py-6 text-center">
-            <div className="text-2xl mb-1">📜</div>
+            <ScrollText className="text-2xl mb-1 text-[#8a8aa0]" />
             <p className="text-[#8a8aa0] text-sm italic">
               No quests. Add one to arm an attack!
             </p>
@@ -226,12 +233,12 @@ export function BattleSide({
         className="w-full py-3 rounded-xl border-b-4 border-[#14532d] bg-gradient-to-b from-[#4ade80] to-[#16a34a] text-[#052e16] text-sm font-black tracking-wider transition-all active:translate-y-[2px] active:border-b-0 disabled:opacity-40 disabled:cursor-not-allowed disabled:active:translate-y-0 disabled:active:border-b-4 hover:brightness-110"
       >
         {!isTurn
-          ? "⏳ WAIT FOR YOUR TURN"
+          ? `${<Clock className="w-4 h-4 inline mr-1" />} WAIT FOR YOUR TURN`
           : isWinner || isKO
-            ? "💀 GAME OVER"
+            ? "GAME OVER"
             : hasPendingTasks
-              ? `⚔ FINISH ${pendingCount} QUEST${pendingCount > 1 ? "S" : ""} TO HEAL`
-              : "💚 HEAL + END TURN"}
+              ? `FINISH ${pendingCount} QUEST${pendingCount > 1 ? "S" : ""} TO HEAL`
+              : `${<Heart className="w-4 h-4 inline mr-1" />} HEAL + END TURN`}
       </button>
     </div>
   );
