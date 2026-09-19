@@ -197,9 +197,9 @@ export default function App() {
             className="bg-[#16162a] border-2 border-[#2a2a4a] text-[#e0e0e8] w-11 h-11 rounded-xl text-lg cursor-pointer transition-all hover:border-[#fbbf24] active:translate-y-[2px]"
           >
             {muted ? (
-              <VolumeX className="w-5 h-5" />
+              <VolumeX className="w-5 h-5 text-[#e0e0e8]" />
             ) : (
-              <Volume2 className="w-5 h-5" />
+              <Volume2 className="w-5 h-5 text-[#e0e0e8]" />
             )}
           </button>
           <button
@@ -226,7 +226,7 @@ export default function App() {
             onClick={(e) => e.stopPropagation()}
           >
             <h2 className="text-xl font-black italic tracking-wide text-white">
-              <Gamepad className="w-5 h-5 mr-2" />
+              <Gamepad className="w-5 h-5 mr-2 text-[#c084fc]" />
               GAME SETTINGS
             </h2>
             <div className="flex flex-col gap-2">
@@ -323,7 +323,7 @@ export default function App() {
                 className="text-[11px] font-black tracking-widest px-3 py-2 rounded-lg border-2 text-center whitespace-nowrap animate-pulse-glow bg-black/60"
                 style={{ borderColor: currentColor, color: currentColor }}
               >
-                <ArrowRight className="w-4 h-4 mr-1" />
+                <ArrowRight className="w-4 h-4 text-white mr-1" />
                 {currentName}
               </div>
             )}
@@ -413,7 +413,7 @@ export default function App() {
               onClick={resetGame}
               className="px-14 py-4 rounded-2xl border-b-8 border-black/60 bg-gradient-to-b from-[#ff6b6b] to-[#4ecdc4] text-white text-xl font-black italic tracking-wide cursor-pointer transition-all hover:brightness-110 hover:-translate-y-[2px] active:translate-y-[4px] active:border-b-0"
             >
-              <RefreshCw className="w-5 h-5 mr-2" />
+              <RefreshCw className="w-5 h-5 text-white mr-2" />
               REMATCH!
             </button>
           </div>
@@ -423,7 +423,7 @@ export default function App() {
       {/* Combat feed */}
       <aside className="relative z-10 border-t-2 border-[#2a2a4a] bg-[#101024]/95 p-4 md:px-10 max-h-[190px] flex flex-col">
         <h3 className="text-[12px] font-black text-[#fbbf24] tracking-[3px] mb-2">
-          <ScrollText className="w-4 h-4 mr-1.5" />
+          <ScrollText className="w-4 h-4 mr-1.5 text-[#fbbf24]" />
           COMBAT FEED
         </h3>
         <div className="flex-1 overflow-y-auto flex flex-col gap-1.5 pr-1">

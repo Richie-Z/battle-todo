@@ -26,9 +26,9 @@ export function BattleSide({
   const isLowHp = !isKO && player.hp <= LOW_HP_THRESHOLD;
   const fighter =
     playerNum === 1 ? (
-      <Swords className="text-3xl" />
+      <Swords className="text-3xl text-[#ff6b6b]" />
     ) : (
-      <Swords className="text-3xl" />
+      <Swords className="text-3xl text-[#4ecdc4]" />
     );
 
   // Flash + shake the card when a new damage/heal floater lands on this side.
@@ -135,8 +135,8 @@ export function BattleSide({
             </span>
             {isLowHp && (
               <span className="ml-1 text-[10px] font-black text-[#f87171] tracking-widest animate-danger-blink">
-                <AlertTriangle className="w-3.5 h-3.5 ml-1 align-middle" /> LOW
-                HP!
+                <AlertTriangle className="w-3.5 h-3.5 inline text-[#f87171] mr-0.5" />{" "}
+                LOW HP!
               </span>
             )}
           </div>
@@ -232,13 +232,22 @@ export function BattleSide({
         disabled={!isTurn || isWinner || isKO || hasPendingTasks}
         className="w-full py-3 rounded-xl border-b-4 border-[#14532d] bg-gradient-to-b from-[#4ade80] to-[#16a34a] text-[#052e16] text-sm font-black tracking-wider transition-all active:translate-y-[2px] active:border-b-0 disabled:opacity-40 disabled:cursor-not-allowed disabled:active:translate-y-0 disabled:active:border-b-4 hover:brightness-110"
       >
-        {!isTurn
-          ? `${<Clock className="w-4 h-4 inline mr-1" />} WAIT FOR YOUR TURN`
-          : isWinner || isKO
-            ? "GAME OVER"
-            : hasPendingTasks
-              ? `FINISH ${pendingCount} QUEST${pendingCount > 1 ? "S" : ""} TO HEAL`
-              : `${<Heart className="w-4 h-4 inline mr-1" />} HEAL + END TURN`}
+        {!isTurn && (
+          <>
+            <Clock className="w-4 h-4 inline text-white mr-1" /> WAIT FOR YOUR
+            TURN
+          </>
+        )}
+        {isWinner || (isKO && "GAME OVER")}
+        {hasPendingTasks &&
+          !isTurn &&
+          `FINISH ${pendingCount} QUEST${pendingCount > 1 ? "S" : ""} TO HEAL`}
+        {!isTurn && !isWinner && !isKO && !hasPendingTasks && (
+          <>
+            <Heart className="w-4 h-4 inline text-[#052e16] mr-1" /> HEAL + END
+            TURN
+          </>
+        )}
       </button>
     </div>
   );

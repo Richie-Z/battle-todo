@@ -13,6 +13,19 @@ import {
 import { generateId, loadState, saveState } from "../utils/helpers";
 import { playClick, playCrit, playHit } from "../utils/sound";
 
+const MIN_DMG = 10;
+const DMG_RANGE = 11;
+
+function getRoundNumber(battleLogLength: number): number {
+  return Math.floor(battleLogLength / 2);
+}
+
+function calculateDamage(roundNumber: number): number {
+  const base = MIN_DMG + DMG_RANGE * Math.min(roundNumber, 10);
+  const scaled = Math.floor(Math.random() * DMG_RANGE) + base;
+  return Math.max(MIN_DMG, scaled);
+}
+
 export function useGame() {
   const [state, setState] = useState<GameState>(() => {
     const loaded = loadState();
@@ -100,7 +113,7 @@ export function useGame() {
         id: generateId(),
         text: taskText,
         completed: false,
-        damage: Math.floor(Math.random() * 11) + 10,
+        damage: calculateDamage(getRoundNumber(state.battleLog.length)),
       };
 
       const playerKey = playerNum === 1 ? "player1" : "player2";
@@ -116,7 +129,7 @@ export function useGame() {
       else setNewTask2("");
       playClick();
     },
-    [newTask1, newTask2],
+    [newTask1, newTask2, state.battleLog.length],
   );
 
   const toggleTask = useCallback(
