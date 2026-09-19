@@ -11,6 +11,7 @@ import {
   STORAGE_KEY,
 } from "../utils/constants";
 import { generateId, loadState, saveState } from "../utils/helpers";
+import { playClick, playCrit, playHit } from "../utils/sound";
 
 export function useGame() {
   const [state, setState] = useState<GameState>(() => {
@@ -44,6 +45,9 @@ export function useGame() {
   const [screenShake, setScreenShake] = useState<boolean>(false);
   const [showSettings, setShowSettings] = useState<boolean>(false);
 
+  const floaterIntervalRef = useRef<ReturnType<typeof setInterval> | undefined>(
+    undefined,
+  );
   const shakeTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(
     undefined,
   );
@@ -67,8 +71,16 @@ export function useGame() {
         prev.filter((f) => now - f.timestamp < FLOATER_LIFETIME),
       );
     }, FLOATER_CLEANUP_INTERVAL);
+    floaterIntervalRef.current = interval;
     return () => clearInterval(interval);
   }, []);
+
+  useEffect(() => {
+    if (state.winner && floaterIntervalRef.current) {
+      clearInterval(floaterIntervalRef.current);
+      floaterIntervalRef.current = undefined;
+    }
+  }, [state.winner]);
 
   const triggerShake = useCallback(() => {
     setScreenShake(true);
@@ -102,6 +114,7 @@ export function useGame() {
 
       if (playerNum === 1) setNewTask1("");
       else setNewTask2("");
+      playClick();
     },
     [newTask1, newTask2],
   );
@@ -165,6 +178,9 @@ export function useGame() {
           timestamp: Date.now(),
         },
       ]);
+      if (damage >= 19) playCrit();
+      else playHit();
+      playClick();
       triggerShake();
     },
     [triggerShake],
@@ -217,11 +233,13 @@ export function useGame() {
   }, []);
 
   const resetGame = useCallback(() => {
+    const p1 = player1Name || "Player 1";
+    const p2 = player2Name || "Player 2";
     if (shakeTimerRef.current) clearTimeout(shakeTimerRef.current);
     setState({
       ...initialState,
-      player1: { ...initialState.player1, name: player1Name },
-      player2: { ...initialState.player2, name: player2Name },
+      player1: { ...initialState.player1, name: p1 },
+      player2: { ...initialState.player2, name: p2 },
     });
     setFloaters([]);
     setScreenShake(false);

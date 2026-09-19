@@ -4,6 +4,7 @@ import { useGame } from "./hooks/useGame";
 import {
   isSoundMuted,
   playClick,
+  playDefeat,
   playHeal,
   playHit,
   playTurn,
@@ -63,7 +64,7 @@ export default function App() {
   const [muted, setMuted] = useState(isSoundMuted());
   const [turnBanner, setTurnBanner] = useState<number | null>(null);
 
-  const round = Math.floor(state.battleLog.length / 2) + 1;
+  const actions = state.battleLog.length;
   const currentName =
     state.currentTurn === 1 ? state.player1.name : state.player2.name;
   const currentColor =
@@ -106,9 +107,12 @@ export default function App() {
     return () => clearTimeout(t);
   }, [state.currentTurn, state.winner]);
 
-  // Victory fanfare.
+  // Victory fanfare + defeat sound.
   useEffect(() => {
-    if (state.winner) playVictory();
+    if (state.winner) {
+      playVictory();
+      playDefeat();
+    }
   }, [state.winner]);
 
   const toggleMute = () => {
@@ -173,7 +177,7 @@ export default function App() {
 
         <div className="flex items-center gap-2 flex-shrink-0">
           <span className="hidden sm:inline-block text-xs font-black tracking-widest px-3 py-2 rounded-lg bg-[#fbbf24]/15 border-2 border-[#fbbf24]/60 text-[#fbbf24]">
-            ROUND {round}
+            ACTIONS {actions}
           </span>
           <button
             type="button"
@@ -296,7 +300,7 @@ export default function App() {
           </div>
           <div className="flex lg:flex-col flex-row gap-2">
             <div className="text-[11px] font-black tracking-widest text-white bg-black/60 px-3 py-2 rounded-lg border-2 border-[#2a2a4a] text-center whitespace-nowrap">
-              ROUND {round}
+              ACTIONS {actions}
             </div>
             {!state.winner && (
               <div
@@ -372,10 +376,10 @@ export default function App() {
               </div>
               <div className="bg-black/60 border-2 border-[#fbbf24]/60 rounded-xl px-4 py-2">
                 <div className="text-[10px] font-black tracking-widest text-[#fbbf24]">
-                  ROUNDS
+                  ACTIONS
                 </div>
                 <div className="text-2xl font-black text-white font-mono">
-                  {round}
+                  {actions}
                 </div>
               </div>
               <div className="bg-black/60 border-2 border-[#4ecdc4]/60 rounded-xl px-4 py-2">
