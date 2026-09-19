@@ -164,6 +164,18 @@ A `logEndRef.current?.scrollIntoView()` effect once ran on mount and yanked the 
 8. Run `bun x biome format --write` to auto-format code
 9. Update this AGENTS.md if architecture changes
 
+## Python (for automation scripts)
+
+Use `uv`, never system `pip` directly. System `pip install --break-system-packages` breaks the Python environment. Always create a virtual environment first:
+
+```bash
+uv venv /tmp/opencode/venv-name
+uv pip install --python /tmp/opencode/venv-name <package>
+/tmp/opencode/venv-name/bin/python script.py
+```
+
+This was discovered by accident: installing `pillow` and `websocket-client` via system `pip` corrupted the Python environment (both packages were later uninstalled and reinstalled into a `uv` venv at `/tmp/opencode/readme-shots`). Always use `uv venv` + `uv pip install --python <venv-path>` to keep the system Python clean.
+
 ## Git Hooks
 
 Uses **Husky v9** + **commitlint** + **Biome**
