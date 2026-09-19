@@ -1,4 +1,12 @@
-import { AlertTriangle, Clock, Heart, ScrollText, Swords } from "lucide-react";
+import {
+  AlertTriangle,
+  Clock,
+  Heart,
+  ScrollText,
+  Skull,
+  Swords,
+  Trophy,
+} from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import type { BattleSideProps } from "../types";
 import { Floater } from "./Floater";
@@ -232,19 +240,27 @@ export function BattleSide({
         disabled={!isTurn || isWinner || isKO || hasPendingTasks}
         className="w-full py-3 rounded-xl border-b-4 border-[#14532d] bg-gradient-to-b from-[#4ade80] to-[#16a34a] text-[#052e16] text-sm font-black tracking-wider transition-all active:translate-y-[2px] active:border-b-0 disabled:opacity-40 disabled:cursor-not-allowed disabled:active:translate-y-0 disabled:active:border-b-4 hover:brightness-110"
       >
-        {!isTurn && (
+        {isKO ? (
           <>
-            <Clock className="w-4 h-4 inline text-white mr-1" /> WAIT FOR YOUR
-            TURN
+            <Skull className="w-4 h-4 inline text-white mr-1" /> GAME OVER
           </>
-        )}
-        {isWinner || (isKO && "GAME OVER")}
-        {hasPendingTasks &&
-          !isTurn &&
-          `FINISH ${pendingCount} QUEST${pendingCount > 1 ? "S" : ""} TO HEAL`}
-        {!isTurn && !isWinner && !isKO && !hasPendingTasks && (
+        ) : isWinner ? (
+          <>
+            <Trophy className="w-4 h-4 inline text-[#fbbf24] mr-1" /> VICTORY
+          </>
+        ) : !hasPendingTasks && isTurn ? (
           <>
             <Heart className="w-4 h-4 inline text-[#052e16] mr-1" /> HEAL + END
+            TURN
+          </>
+        ) : hasPendingTasks ? (
+          <>
+            <Swords className="w-4 h-4 inline text-white mr-1" /> FINISH{" "}
+            {pendingCount} QUEST{pendingCount > 1 ? "S" : ""} TO HEAL
+          </>
+        ) : (
+          <>
+            <Clock className="w-4 h-4 inline text-white mr-1" /> WAIT FOR YOUR
             TURN
           </>
         )}
