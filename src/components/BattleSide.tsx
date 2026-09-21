@@ -242,11 +242,11 @@ export function BattleSide({
       >
         {isKO ? (
           <>
-            <Skull className="w-4 h-4 inline text-white mr-1" /> GAME OVER
+            <Skull className="w-4 h-4 inline text-[#052e16] mr-1" /> GAME OVER
           </>
         ) : isWinner ? (
           <>
-            <Trophy className="w-4 h-4 inline text-[#fbbf24] mr-1" /> VICTORY
+            <Trophy className="w-4 h-4 inline text-[#052e16] mr-1" /> VICTORY
           </>
         ) : !hasPendingTasks && isTurn ? (
           <>

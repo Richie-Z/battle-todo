@@ -38,14 +38,14 @@ export function TaskItem({
           task.completed
             ? "border-[#4ade80] bg-[#4ade80]/20 text-[#4ade80]"
             : actionable
-              ? "border-[var(--player-color)] bg-[var(--player-color)]/15 text-white group-hover:scale-110 group-hover:shadow-[0_0_14px_var(--player-glow)]"
+              ? "border-[var(--player-color)] bg-[var(--player-color)]/15 text-[var(--player-color)] group-hover:scale-110 group-hover:shadow-[0_0_14px_var(--player-glow)]"
               : "border-[#2a2a4a] bg-white/5 text-[#8a8aa0]"
         } disabled:cursor-not-allowed`}
       >
         {task.completed ? (
-          <Check className="w-6 h-6 text-current" />
+          <Check className="w-6 h-6 text-[#4ade80]" />
         ) : (
-          <Swords className="w-6 h-6 text-current" />
+          <Swords className="w-6 h-6 text-[var(--player-color)]" />
         )}
       </button>
 
