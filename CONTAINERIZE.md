@@ -24,3 +24,4 @@ boot + healthcheck only (DB not smoke-tested). db_driver: unknown. Never migrate
 ## Flags
 
 Smoke results: 2026-11-20T23:07:56+07:00 boot=PASS http=200 db=not verified (no read-only CLI for react-spa; health endpoint only)
+Smoke results: 2026-11-21T21:26:28+07:00 boot=PASS http=200 db=skipped (legacy mysqli app; pgsql not supported without a code rewrite)
